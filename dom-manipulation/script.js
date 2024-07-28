@@ -23,7 +23,7 @@ document.getElementById('newQuote').addEventListener('click', showRandomQuote);
 // Function to save quotes to local storage
 function saveQuotes() {
   localStorage.setItem('quotes', JSON.stringify(quotes));
-  populateCategoryFilter();
+  populateCategories();
 }
 
 // Function to add a new quote
@@ -95,7 +95,7 @@ function importFromJsonFile(event) {
 document.getElementById('exportQuotes').addEventListener('click', exportToJsonFile);
 
 // Function to populate the category filter dropdown
-function populateCategoryFilter() {
+function populateCategories() {
   const categoryFilter = document.getElementById('categoryFilter');
   categoryFilter.innerHTML = '<option value="all">All Categories</option>';
   const categories = [...new Set(quotes.map(quote => quote.category))];
@@ -125,7 +125,7 @@ function filterQuotes() {
 }
 
 // Initial setup: populate category filter, display a random quote, and create the form
-populateCategoryFilter();
+populateCategories();
 showRandomQuote();
 createAddQuoteForm();
 
