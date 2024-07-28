@@ -160,15 +160,22 @@ async function postQuoteToServer(quote) {
 
 // Function to sync local quotes with the server
 async function syncQuotes() {
-  const serverQuotes = await fetchQuotesFromServer();
+  try {
+    const serverQuotes = await fetchQuotesFromServer();
 
-  // Resolve conflicts (server takes precedence)
-  const serverQuotesSet = new Set(serverQuotes.map(quote => JSON.stringify(quote)));
-  quotes = quotes.filter(quote => !serverQuotesSet.has(JSON.stringify(quote)));
-  quotes.push(...serverQuotes);
+    // Resolve conflicts (server takes precedence)
+    const serverQuotesSet = new Set(serverQuotes.map(quote => JSON.stringify(quote)));
+    quotes = quotes.filter(quote => !serverQuotesSet.has(JSON.stringify(quote)));
+    quotes.push(...serverQuotes);
 
-  localStorage.setItem('quotes', JSON.stringify(quotes));
-  populateCategories();
+    localStorage.setItem('quotes', JSON.stringify(quotes));
+    populateCategories();
+
+    // Notify the user that quotes have been synced
+    alert('Quotes synced with server!');
+  } catch (error) {
+    console.error('Error syncing quotes:', error);
+  }
 }
 
 // Initial setup: populate category filter, display a random quote, and create the form
