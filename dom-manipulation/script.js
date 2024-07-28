@@ -7,6 +7,9 @@ let quotes = JSON.parse(localStorage.getItem('quotes')) || [
   { text: "Life is what happens when you're busy making other plans.", category: "Life" }
 ];
 
+// Simulated server URL
+const serverUrl = 'https://jsonplaceholder.typicode.com/posts';
+
 // Function to display a random quote
 function showRandomQuote() {
   const filteredQuotes = getFilteredQuotes();
@@ -20,10 +23,11 @@ function showRandomQuote() {
 // Event listener for the "Show New Quote" button
 document.getElementById('newQuote').addEventListener('click', showRandomQuote);
 
-// Function to save quotes to local storage
+// Function to save quotes to local storage and server
 function saveQuotes() {
   localStorage.setItem('quotes', JSON.stringify(quotes));
   populateCategories();
+  syncWithServer();
 }
 
 // Function to add a new quote
@@ -124,6 +128,24 @@ function filterQuotes() {
   showRandomQuote();
 }
 
+// Function to sync local quotes with the server
+async function syncWithServer() {
+  try {
+    const response = await fetch(serverUrl);
+    const serverQuotes = await response.json();
+
+    // Resolve conflicts (server takes precedence)
+    const serverQuotesSet = new Set(serverQuotes.map(quote => JSON.stringify(quote)));
+    quotes = quotes.filter(quote => !serverQuotesSet.has(JSON.stringify(quote)));
+    quotes.push(...serverQuotes);
+
+    localStorage.setItem('quotes', JSON.stringify(quotes));
+    populateCategories();
+  } catch (error) {
+    console.error('Error syncing with server:', error);
+  }
+}
+
 // Initial setup: populate category filter, display a random quote, and create the form
 populateCategories();
 showRandomQuote();
@@ -131,3 +153,6 @@ createAddQuoteForm();
 
 // Set the selected category from local storage if available
 document.getElementById('categoryFilter').value = localStorage.getItem('selectedCategory') || 'all';
+
+// Periodically sync with the server
+setInterval(syncWithServer, 60000); // Sync every 60 seconds
