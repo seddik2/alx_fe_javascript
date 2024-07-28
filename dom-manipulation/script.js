@@ -128,22 +128,29 @@ function filterQuotes() {
   showRandomQuote();
 }
 
-// Function to sync local quotes with the server
-async function syncWithServer() {
+// Function to fetch quotes from the server
+async function fetchQuotesFromServer() {
   try {
     const response = await fetch(serverUrl);
     const serverQuotes = await response.json();
-
-    // Resolve conflicts (server takes precedence)
-    const serverQuotesSet = new Set(serverQuotes.map(quote => JSON.stringify(quote)));
-    quotes = quotes.filter(quote => !serverQuotesSet.has(JSON.stringify(quote)));
-    quotes.push(...serverQuotes);
-
-    localStorage.setItem('quotes', JSON.stringify(quotes));
-    populateCategories();
+    return serverQuotes;
   } catch (error) {
-    console.error('Error syncing with server:', error);
+    console.error('Error fetching quotes from server:', error);
+    return [];
   }
+}
+
+// Function to sync local quotes with the server
+async function syncWithServer() {
+  const serverQuotes = await fetchQuotesFromServer();
+
+  // Resolve conflicts (server takes precedence)
+  const serverQuotesSet = new Set(serverQuotes.map(quote => JSON.stringify(quote)));
+  quotes = quotes.filter(quote => !serverQuotesSet.has(JSON.stringify(quote)));
+  quotes.push(...serverQuotes);
+
+  localStorage.setItem('quotes', JSON.stringify(quotes));
+  populateCategories();
 }
 
 // Initial setup: populate category filter, display a random quote, and create the form
