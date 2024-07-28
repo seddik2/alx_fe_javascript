@@ -27,7 +27,7 @@ document.getElementById('newQuote').addEventListener('click', showRandomQuote);
 function saveQuotes() {
   localStorage.setItem('quotes', JSON.stringify(quotes));
   populateCategories();
-  syncWithServer();
+  syncQuotes();
 }
 
 // Function to add a new quote
@@ -159,7 +159,7 @@ async function postQuoteToServer(quote) {
 }
 
 // Function to sync local quotes with the server
-async function syncWithServer() {
+async function syncQuotes() {
   const serverQuotes = await fetchQuotesFromServer();
 
   // Resolve conflicts (server takes precedence)
@@ -180,4 +180,4 @@ createAddQuoteForm();
 document.getElementById('categoryFilter').value = localStorage.getItem('selectedCategory') || 'all';
 
 // Periodically sync with the server
-setInterval(syncWithServer, 60000); // Sync every 60 seconds
+setInterval(syncQuotes, 60000); // Sync every 60 seconds
